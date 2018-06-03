@@ -5,7 +5,7 @@ FROM docker.io/nginx:latest
 #COPY html /usr/share/nginx/html
 #RUN chown nginx:nginx /usr/share/nginx/html
 
-EXPOSE 80 443
+#EXPOSE 80 443
 
 #CMD conf-builder.sh &&\
 #  nginx -g "daemon off;"
