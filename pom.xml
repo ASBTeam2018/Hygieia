@@ -52,9 +52,15 @@
   </developers>
 
   <scm>
+  <!-- 
     <connection>scm:git:https://github.com/capitalone/Hygieia.git/</connection>
     <developerConnection>scm:git:https://github.com/capitalone/Hygieia.git/</developerConnection>
     <url>https://github.com/capitalone/Hygieia.git</url>
+    <tag>HEAD</tag>
+    -->
+    <connection>scm:git:https://github.com/ASBTeam2018/Hygieia.git/</connection>
+    <developerConnection>scm:git:https://github.com/ASBTeam2018/Hygieia.git/</developerConnection>
+    <url>https://github.com/ASBTeam2018/Hygieia.git</url>
     <tag>HEAD</tag>
   </scm>
 

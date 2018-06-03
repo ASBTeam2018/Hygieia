@@ -241,6 +241,17 @@
 
     </build>
 
+	<!-- Becuase use the mirror in company, need to add "!repo.jenkins-ci.org" in the setting file;
+	otherwise, the build will fail. 
+	This makes the get repo.jenkins-ci.org from the central repository instead of the private repository.
+	The snippet in the ~/.m2/setting.xml, like this:
+	<mirror>
+        <id>nexus</id>
+        <mirrorOf>*,!repo.jenkins-ci.org</mirrorOf>
+        <name>xxxxx</name>
+        <url>http://xx.xx.xx.xx:8081/repository/maven-public/</url>
+    </mirror>
+	 -->
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
