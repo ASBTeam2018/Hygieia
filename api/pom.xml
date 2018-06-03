@@ -4,7 +4,7 @@
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Hygieia Rest API Layer</description>
-    <url>https://github.com/capitalone/Hygieia</url>
+    <url>https://github.com/ASBTeam2018/Hygieia</url>
 
     <parent>
         <groupId>com.capitalone.dashboard</groupId>
@@ -69,6 +69,16 @@
                         </resource>
                     </resources>
                 </configuration>
+                <!-- This is for build api images seperately if the global docker setting is disable in the parent project(pom.xml)
+                <executions>
+		          <execution>
+		            <phase>package</phase>
+		            <goals>
+		              <goal>build</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		         -->
             </plugin>
         </plugins>
     </build>
