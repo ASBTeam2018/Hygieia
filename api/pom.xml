@@ -59,8 +59,27 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <configuration>
                     <skipDockerBuild>false</skipDockerBuild>
-                    <imageName>hygieia-${project.build.finalName}</imageName>
+                    <imageName>${docker.registry}/hygieia-${project.build.finalName}</imageName>
                     <dockerDirectory>${project.basedir}/docker</dockerDirectory>
+                   
+                    <!-- This is for build api images seperately if the global docker setting is disable in the parent project(pom.xml)
+                         And use this cli to push images: mvn package docker:build -DpushImage, the detail: https://github.com/spotify/docker-maven-plugin#specify-build-info-in-the-pom
+                         The following configuration is for authentication of docker.io
+                         need to config ~/.m2/setting.xml as well, like this:
+                           <server>
+						      <id>docker.io</id>
+						      <username>zhangxiangcc</username>
+						      <password>xxxxxxx</password>
+						      <configuration>
+						        <email>zhangxiangcc@126.com</email>
+						      </configuration>
+						    </server>
+                    -->
+                    <serverId>docker.io</serverId>
+      				<registryUrl>https://index.docker.io/v1/</registryUrl>
+      				<!-- 
+                    <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                     -->
                     <resources>
                         <resource>
                             <targetPath>/hygieia</targetPath>
@@ -69,16 +88,6 @@
                         </resource>
                     </resources>
                 </configuration>
-                <!-- This is for build api images seperately if the global docker setting is disable in the parent project(pom.xml)
-                <executions>
-		          <execution>
-		            <phase>package</phase>
-		            <goals>
-		              <goal>build</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		         -->
             </plugin>
         </plugins>
     </build>

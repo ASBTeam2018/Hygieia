@@ -88,6 +88,8 @@
     <joda-time.version>2.7</joda-time.version>
     <joda-convert.version>1.8.1</joda-convert.version>
     <docker.useConfigFile>false</docker.useConfigFile>
+    <!-- add the dockerhub address, but suggest to push images by manually -->
+    <docker.registry>docker.io/zhangxiangcc</docker.registry>
   </properties>
 
   <build>
@@ -108,6 +110,19 @@
               <goal>build</goal>
             </goals>
           </execution>
+          <!-- 
+          <execution>
+				<id>push-image</id>
+				<phase>deploy</phase>
+				<goals>
+					<goal>push</goal>
+				</goals>
+				<configuration>
+					<serverId>harbor</serverId>
+					<imageName>${docker.registry}</imageName>
+				</configuration>
+			</execution>
+			 -->
         </executions>
       </plugin>
       <plugin>
