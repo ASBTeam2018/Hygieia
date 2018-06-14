@@ -1,10 +1,4 @@
 gittest.txt
-d
-d
-d
-d
-d
-d
-d
-d
-d
+123
+23
+3
