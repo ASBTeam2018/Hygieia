@@ -8,3 +8,4 @@ gittest.txt
 hahahahaha
 
 setTimeZone("UTC")
+test test
