@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.TaskScheduler;
@@ -29,6 +31,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * CollectorTask that fetches Commit information from PlainGit
@@ -66,7 +68,7 @@ public class PlainGitCollectorTask extends CollectorTask<Collector> {
                                PlainGitClient plainGitClient,
                                PlainGitSettings plainGitSettings,
                                ComponentRepository dbComponentRepository) {
-        super(taskScheduler, "GitHub");
+        super(taskScheduler, "PlainGit");
         this.collectorRepository = collectorRepository;
         this.plainGitRepoRepository = plainGitRepoRepository;
         this.commitRepository = commitRepository;
@@ -85,7 +87,7 @@ public class PlainGitCollectorTask extends CollectorTask<Collector> {
     @Override
     public Collector getCollector() {
         Collector protoType = new Collector();
-        protoType.setName("GitHub");
+        protoType.setName("PlainGit");
         protoType.setCollectorType(CollectorType.SCM);
         protoType.setOnline(true);
         protoType.setEnabled(true);
@@ -185,12 +187,12 @@ public class PlainGitCollectorTask extends CollectorTask<Collector> {
                     }
 
                     // Step 2: Get all the issues
-                    LOG.info(repo.getOptions().toString() + "::" + repo.getBranch() + " get issues");
+                   /* LOG.info(repo.getOptions().toString() + "::" + repo.getBranch() + " get issues");
                     List<GitRequest> issues = plainGitClient.getIssues(repo, firstRun);
-                    issueCount += processList(repo, issues, "issue");
+                    issueCount += processList(repo, issues, "issue");*/
 
                     //Step 2: Get all the Pull Requests
-                    LOG.info(repo.getOptions().toString() + "::" + repo.getBranch() + "::get pulls");
+                    /*LOG.info(repo.getOptions().toString() + "::" + repo.getBranch() + "::get pulls");
                     List<GitRequest> allPRs = gitRequestRepository.findRequestNumberAndLastUpdated(repo.getId(), "pull");
 
                     Map<Long, String> prCloseMap = allPRs.stream().collect(
@@ -199,7 +201,7 @@ public class PlainGitCollectorTask extends CollectorTask<Collector> {
                             )
                     );
                     List<GitRequest> pulls = plainGitClient.getPulls(repo, "all", firstRun, prCloseMap);
-                    pullCount += processList(repo, pulls, "pull");
+                    pullCount += processList(repo, pulls, "pull");*/
 
                     repo.setLastUpdated(System.currentTimeMillis());
                 } catch (HttpStatusCodeException hc) {
@@ -225,7 +227,16 @@ public class PlainGitCollectorTask extends CollectorTask<Collector> {
                     LOG.error("Error fetching commits for:" + repo.getRepoUrl(), he);
                     CollectionError error = new CollectionError("Bad repo url", repo.getRepoUrl());
                     repo.getErrors().add(error);
-                }
+                } catch (IOException e) {
+                	  CollectionError error = new CollectionError("Bad repo url", repo.getRepoUrl());
+                      repo.getErrors().add(error);
+				} catch (NoWorkTreeException e) {
+					  CollectionError error = new CollectionError("Bad repo url", repo.getRepoUrl());
+	                  repo.getErrors().add(error);
+				} catch (GitAPIException e) {
+					  CollectionError error = new CollectionError("Bad repo url", repo.getRepoUrl());
+	                  repo.getErrors().add(error);
+				}
                 plainGitRepoRepository.save(repo);
             }
             repoCount++;

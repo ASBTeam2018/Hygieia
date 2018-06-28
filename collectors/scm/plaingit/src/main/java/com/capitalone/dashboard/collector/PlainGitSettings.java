@@ -23,7 +23,12 @@ public class PlainGitSettings {
 	@Value("${plaingit.rateLimitThreshold:10}")
 	private int rateLimitThreshold;
 	private String personalAccessToken;
-
+	
+	// plainGit
+	private String localRepoPath;
+	private String localRepoGitConfig;
+	private String remoteRepoURI;
+	private String localCodeDir;
 
 	public String getHost() {
 		return host;
@@ -88,4 +93,37 @@ public class PlainGitSettings {
 	public void setPersonalAccessToken(String personalAccessToken) {
 		this.personalAccessToken = personalAccessToken;
 	}
+
+	public String getLocalRepoPath() {
+		return localRepoPath;
+	}
+
+	public void setLocalRepoPath(String localRepoPath) {
+		this.localRepoPath = localRepoPath;
+	}
+
+	public String getLocalRepoGitConfig() {
+		return localRepoGitConfig;
+	}
+
+	public void setLocalRepoGitConfig(String localRepoGitConfig) {
+		this.localRepoGitConfig = localRepoGitConfig;
+	}
+
+	public String getRemoteRepoURI() {
+		return remoteRepoURI;
+	}
+
+	public void setRemoteRepoURI(String remoteRepoURI) {
+		this.remoteRepoURI = remoteRepoURI;
+	}
+
+	public String getLocalCodeDir() {
+		return localCodeDir;
+	}
+
+	public void setLocalCodeDir(String localCodeDir) {
+		this.localCodeDir = localCodeDir;
+	}
+	
 }

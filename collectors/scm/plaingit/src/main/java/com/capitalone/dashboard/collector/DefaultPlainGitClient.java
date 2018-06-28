@@ -18,6 +18,10 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,6 +36,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -71,26 +77,31 @@ public class DefaultPlainGitClient implements PlainGitClient {
      * @param firstRun
      * @return list of commits
      * @throws RestClientException
-     * @throws MalformedURLException
      * @throws HygieiaException
+     * @throws IOException 
+     * @throws GitAPIException 
+     * @throws NoWorkTreeException 
      */
     @Override
-    public List<Commit> getCommits(PlainGitRepo repo, boolean firstRun, List<Pattern> commitExclusionPatterns) throws RestClientException, MalformedURLException, HygieiaException {
+    public List<Commit> getCommits(PlainGitRepo repo, boolean firstRun, List<Pattern> commitExclusionPatterns) throws RestClientException, HygieiaException, IOException, NoWorkTreeException, GitAPIException {
 
         List<Commit> commits = new ArrayList<>();
-
+        
+        Git git = Git.open(new File(settings.getLocalRepoGitConfig()));
+        git.status().call();
+		Iterable<RevCommit> iterable = git.log().call();
         // format URL
-        String repoUrl = (String) repo.getOptions().get("url");
-        PlainGitParsed gitHubParsed = new PlainGitParsed(repoUrl);
+        //String repoUrl = (String) repo.getOptions().get("url");
+        /*PlainGitParsed gitHubParsed = new PlainGitParsed(repoUrl);
         String apiUrl = gitHubParsed.getApiUrl();
 
         String queryUrl = apiUrl.concat("/commits?sha=" + repo.getBranch()
                 + "&since=" + getTimeForApi(getRunDate(repo, firstRun)));
         String decryptedPassword = decryptString(repo.getPassword(), settings.getKey());
         String personalAccessToken = (String) repo.getOptions().get("personalAccessToken");
-        String decryptedPersonalAccessToken = decryptString(personalAccessToken, settings.getKey());
-        boolean lastPage = false;
-        String queryUrlPage = queryUrl;
+        String decryptedPersonalAccessToken = decryptString(personalAccessToken, settings.getKey());*/
+        /*boolean lastPage = false;
+        String queryUrlPage = "";
         while (!lastPage) {
             LOG.info("Executing " + queryUrlPage);
             ResponseEntity<String> response = makeRestCall(queryUrlPage, repo.getUserId(), decryptedPassword,decryptedPersonalAccessToken);
@@ -116,20 +127,7 @@ public class DefaultPlainGitClient implements PlainGitClient {
                         parentShas.add(str((JSONObject) parentObj, "sha"));
                     }
                 }
-
-                Commit commit = new Commit();
-                commit.setTimestamp(System.currentTimeMillis());
-                commit.setScmUrl(repo.getRepoUrl());
-                commit.setScmBranch(repo.getBranch());
-                commit.setScmRevisionNumber(sha);
-                commit.setScmParentRevisionNumbers(parentShas);
-                commit.setScmAuthor(author);
-                commit.setScmAuthorLogin(authorLogin);
-                commit.setScmCommitLog(message);
-                commit.setScmCommitTimestamp(timestamp);
-                commit.setNumberOfChanges(1);
-                commit.setType(getCommitType(CollectionUtils.size(parents), message, commitExclusionPatterns));
-                commits.add(commit);
+            	
             }
             if (CollectionUtils.isEmpty(jsonArray)) {
                 lastPage = true;
@@ -141,7 +139,36 @@ public class DefaultPlainGitClient implements PlainGitClient {
                     queryUrlPage = getNextPageUrl(response);
                 }
             }
-        }
+        }*/
+        
+		for(RevCommit revCommit : iterable) {
+			String revStr = revCommit.toString();
+			String [] revArry = revStr.split(" ");
+			String sha = revArry[1];
+			String commitTime = revArry[2];
+			long timestamp =Long.parseLong(commitTime);
+			
+	    	List<String> parentShas = new ArrayList<>();
+	    	String author = revCommit.getCommitterIdent().getName();
+	    	String authorLogin = author;
+	    	String message = revCommit.getFullMessage();
+			Commit commit = new Commit();
+	        commit.setTimestamp(System.currentTimeMillis());
+	        commit.setScmUrl(repo.getRepoUrl());
+	        commit.setScmBranch(repo.getBranch());
+	        commit.setScmRevisionNumber(sha);
+	        commit.setScmParentRevisionNumbers(parentShas);
+	        commit.setScmAuthor(author);
+	        commit.setScmAuthorLogin(authorLogin);
+	        commit.setScmCommitLog(message);
+	        commit.setScmCommitTimestamp(timestamp);
+	        commit.setNumberOfChanges(1);
+	        //commit.setType(getCommitType(CollectionUtils.size(""), message, commitExclusionPatterns));
+	        commits.add(commit);
+		}
+        
+       
+        
         return commits;
     }
 
